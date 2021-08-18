@@ -1,0 +1,98 @@
+package sg.edu.rp.c346.id20047536.movierating;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioGroup;
+import android.widget.Toast;
+
+public class SecondActivity extends AppCompatActivity {
+
+    Button btnInsert, btnShowList;
+    EditText etTitle, etSingers, etYear;
+    RadioGroup rg;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_second);
+
+        etTitle = (EditText) findViewById(R.id.etTitle);
+        etSingers = (EditText) findViewById(R.id.etActors);
+        etYear = (EditText) findViewById(R.id.etYear);
+        btnInsert = (Button) findViewById(R.id.btnInsertSong);
+        btnShowList = (Button) findViewById(R.id.btnShowList);
+        rg = (RadioGroup) findViewById(R.id.rgStars);
+
+        btnInsert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                String title = etTitle.getText().toString().trim();
+                String singers = etSingers.getText().toString().trim();
+                if (title.length() == 0 || singers.length() == 0){
+                    Toast.makeText(SecondActivity.this, "Incomplete data", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+
+                String year_str = etYear.getText().toString().trim();
+                int year = 0;
+                try {
+                    year = Integer.valueOf(year_str);
+                } catch (Exception e){
+                    Toast.makeText(SecondActivity.this, "Invalid year", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                DBHelper dbh = new DBHelper(SecondActivity.this);
+
+                int stars = getStars();
+                dbh.insertSong(title, singers, year, stars);
+                dbh.close();
+                Toast.makeText(SecondActivity.this, "Inserted", Toast.LENGTH_LONG).show();
+
+                etTitle.setText("");
+                etSingers.setText("");
+                etYear.setText("");
+
+            }
+        });
+
+        btnShowList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                Intent i = new Intent(SecondActivity.this, ThirdActivity.class);
+                startActivity(i);
+            }
+        });
+
+    }
+
+
+    private int getStars() {
+        int stars = 1;
+        switch (rg.getCheckedRadioButtonId()) {
+            case R.id.radio1:
+                stars = 1;
+                break;
+            case R.id.radio2:
+                stars = 2;
+                break;
+            case R.id.radio3:
+                stars = 3;
+                break;
+            case R.id.radio4:
+                stars = 4;
+                break;
+            case R.id.radio5:
+                stars = 5;
+                break;
+        }
+        return stars;
+    }
+}
